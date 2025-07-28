@@ -30,17 +30,17 @@ export class main extends Component {
     @property(JsonAsset)
     jsonAsset: JsonAsset = null;
 
-    @property(CCInteger)
-    matrixWidth: number = null;
-
-    @property(CCInteger)
-    matrixHeight: number = null;
-
     @property(Prefab)
     tilePrefab: Prefab = null;
 
+    @property(Prefab)
+    starPrefab: Prefab = null;
+
     @property(Graphics)
     graphic: Graphics = null;
+
+    private matrixWidth: number = null;
+    private matrixHeight: number = null;
 
     private isConnect: boolean = true;
     private preTile: tilePrefab = null;
@@ -58,6 +58,8 @@ export class main extends Component {
         for (let i = 0; i < this.matrixWidth + 1; i++) {
             this.matrixTiles[i] = [];
         }
+
+        console.log(this.node.worldPosition);
 
         map.forEach((item, index) => {
             const nodeTemp: Node = instantiate(this.tilePrefab);
@@ -103,15 +105,26 @@ export class main extends Component {
             );
 
             if (shortPath) {
-                //Draw the connected line
-                let [x0, y0] = shortPath.shift();
-                while (shortPath.length > 0) {
-                    const [x1, y1] = shortPath.shift();
+                //Draw the connected line && add star
+                for (let i = 0; i < shortPath.length - 1; i++) {
+                    const [x0, y0] = shortPath[i];
+                    const [x1, y1] = shortPath[i + 1];
+
+                    const nodeTemp = instantiate(this.starPrefab);
+                    nodeTemp.setPosition(this.convertMatixToVec3(x0, y0));
+                    this.graphic.node.addChild(nodeTemp);
+                    this.graphic.getComponent(lineAnim).starAnim(nodeTemp, i);
+
                     const startPos = this.convertMatixToVec3(x0, y0);
                     const endPos = this.convertMatixToVec3(x1, y1);
                     this.drawLine(startPos, endPos);
-                    [x0, y0] = [x1, y1];
                 }
+                // Instantiate the last node at the end position
+                const [lastX, lastY] = shortPath[shortPath.length - 1];
+                const lastNode = instantiate(this.starPrefab);
+                lastNode.setPosition(this.convertMatixToVec3(lastX, lastY));
+                this.graphic.node.addChild(lastNode);
+                this.graphic.getComponent(lineAnim).starAnim(lastNode, shortPath.length-1);
 
                 //Destroy connected tiles
                 this.matrixTiles[this.preTile.posMatrixX][
