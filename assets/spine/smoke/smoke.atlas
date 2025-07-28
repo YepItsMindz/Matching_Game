@@ -1,0 +1,62 @@
+
+smoke.webp
+size: 1024,256
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+smoke00
+  rotate: false
+  xy: 2, 2
+  size: 172, 86
+  orig: 172, 86
+  offset: 0, 0
+  index: -1
+smoke01
+  rotate: false
+  xy: 176, 90
+  size: 172, 86
+  orig: 172, 86
+  offset: 0, 0
+  index: -1
+smoke02
+  rotate: false
+  xy: 176, 2
+  size: 172, 86
+  orig: 172, 86
+  offset: 0, 0
+  index: -1
+smoke03
+  rotate: false
+  xy: 350, 90
+  size: 172, 86
+  orig: 172, 86
+  offset: 0, 0
+  index: -1
+smoke04
+  rotate: false
+  xy: 350, 2
+  size: 172, 86
+  orig: 172, 86
+  offset: 0, 0
+  index: -1
+smoke05
+  rotate: false
+  xy: 524, 90
+  size: 172, 86
+  orig: 172, 86
+  offset: 0, 0
+  index: -1
+smoke06
+  rotate: false
+  xy: 524, 2
+  size: 172, 86
+  orig: 172, 86
+  offset: 0, 0
+  index: -1
+smoke07
+  rotate: false
+  xy: 2, 90
+  size: 172, 86
+  orig: 172, 86
+  offset: 0, 0
+  index: -1

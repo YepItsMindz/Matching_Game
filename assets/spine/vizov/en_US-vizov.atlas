@@ -1,0 +1,76 @@
+
+en_US-vizov.webp
+size: 256,256
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+a
+  rotate: true
+  xy: 157, 101
+  size: 73, 83
+  orig: 73, 83
+  offset: 0, 0
+  index: -1
+c
+  rotate: true
+  xy: 73, 85
+  size: 74, 82
+  orig: 74, 82
+  offset: 0, 0
+  index: -1
+e1
+  rotate: true
+  xy: 2, 10
+  size: 57, 83
+  orig: 57, 83
+  offset: 0, 0
+  index: -1
+e2
+  rotate: false
+  xy: 2, 69
+  size: 69, 90
+  orig: 69, 90
+  offset: 0, 0
+  index: -1
+g
+  rotate: false
+  xy: 80, 165
+  size: 75, 82
+  orig: 75, 82
+  offset: 0, 0
+  index: -1
+h
+  rotate: true
+  xy: 157, 176
+  size: 71, 86
+  orig: 71, 86
+  offset: 0, 0
+  index: -1
+l1
+  rotate: false
+  xy: 87, 2
+  size: 53, 81
+  orig: 53, 81
+  offset: 0, 0
+  index: -1
+l2
+  rotate: true
+  xy: 157, 48
+  size: 51, 81
+  orig: 51, 81
+  offset: 0, 0
+  index: -1
+n
+  rotate: false
+  xy: 2, 161
+  size: 76, 86
+  orig: 76, 86
+  offset: 0, 0
+  index: -1
+star_smooth
+  rotate: false
+  xy: 142, 6
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1

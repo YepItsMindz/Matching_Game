@@ -1,0 +1,55 @@
+
+shine_under_chest2.webp
+size: 512,128
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+L1
+  rotate: true
+  xy: 205, 34
+  size: 19, 77
+  orig: 19, 77
+  offset: 0, 0
+  index: -1
+Sh
+  rotate: false
+  xy: 205, 55
+  size: 107, 57
+  orig: 107, 57
+  offset: 0, 0
+  index: -1
+glowFire
+  rotate: false
+  xy: 369, 63
+  size: 49, 49
+  orig: 49, 49
+  offset: 0, 0
+  index: -1
+shine_star
+  rotate: false
+  xy: 420, 72
+  size: 40, 40
+  orig: 40, 40
+  offset: 0, 0
+  index: -1
+star1
+  rotate: false
+  xy: 2, 2
+  size: 110, 110
+  orig: 110, 110
+  offset: 0, 0
+  index: -1
+star3
+  rotate: false
+  xy: 114, 17
+  size: 89, 95
+  orig: 89, 95
+  offset: 0, 0
+  index: -1
+triangle
+  rotate: false
+  xy: 314, 64
+  size: 53, 48
+  orig: 53, 48
+  offset: 0, 0
+  index: -1

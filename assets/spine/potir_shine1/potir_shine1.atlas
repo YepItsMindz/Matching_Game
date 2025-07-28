@@ -1,0 +1,27 @@
+
+potir_shine1.webp
+size: 128,128
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+glow
+  rotate: false
+  xy: 2, 56
+  size: 69, 69
+  orig: 69, 69
+  offset: 0, 0
+  index: -1
+ray_big
+  rotate: false
+  xy: 73, 78
+  size: 49, 47
+  orig: 49, 47
+  offset: 0, 0
+  index: -1
+ray_high3
+  rotate: false
+  xy: 2, 2
+  size: 71, 52
+  orig: 71, 52
+  offset: 0, 0
+  index: -1

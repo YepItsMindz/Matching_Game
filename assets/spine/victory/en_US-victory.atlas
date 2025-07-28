@@ -1,0 +1,117 @@
+en_US-victory.webp
+size: 1024,128
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+!
+  rotate: false
+  xy: 948, 36
+  size: 50, 90
+  orig: 50, 90
+  offset: 0, 0
+  index: -1
+blastwave1
+  rotate: false
+  xy: 192, 35
+  size: 91, 91
+  orig: 91, 91
+  offset: 0, 0
+  index: -1
+c
+  rotate: false
+  xy: 592, 37
+  size: 75, 89
+  orig: 75, 89
+  offset: 0, 0
+  index: -1
+glow2
+  rotate: true
+  xy: 114, 17
+  size: 109, 76
+  orig: 109, 76
+  offset: 0, 0
+  index: -1
+halo1
+  rotate: true
+  xy: 508, 43
+  size: 83, 82
+  orig: 83, 82
+  offset: 0, 0
+  index: -1
+i
+  rotate: false
+  xy: 809, 34
+  size: 68, 92
+  orig: 68, 92
+  offset: 0, 0
+  index: -1
+o
+  rotate: false
+  xy: 285, 34
+  size: 78, 92
+  orig: 78, 92
+  offset: 0, 0
+  index: -1
+r
+  rotate: false
+  xy: 669, 27
+  size: 67, 99
+  orig: 67, 99
+  offset: 0, 0
+  index: -1
+shine3
+  rotate: false
+  xy: 550, 6
+  size: 35, 35
+  orig: 35, 35
+  offset: 0, 0
+  index: -1
+shine_rays
+  rotate: true
+  xy: 441, 21
+  size: 105, 65
+  orig: 105, 65
+  offset: 0, 0
+  index: -1
+star
+  rotate: false
+  xy: 192, 3
+  size: 27, 30
+  orig: 27, 30
+  offset: 0, 0
+  index: -1
+star1
+  rotate: false
+  xy: 2, 16
+  size: 110, 110
+  orig: 110, 110
+  offset: 0, 0
+  index: -1
+star2
+  rotate: false
+  xy: 508, 2
+  size: 40, 39
+  orig: 40, 39
+  offset: 0, 0
+  index: -1
+t
+  rotate: false
+  xy: 879, 36
+  size: 67, 90
+  orig: 67, 90
+  offset: 0, 0
+  index: -1
+v
+  rotate: false
+  xy: 365, 32
+  size: 74, 94
+  orig: 74, 94
+  offset: 0, 0
+  index: -1
+y
+  rotate: false
+  xy: 738, 32
+  size: 69, 94
+  orig: 69, 94
+  offset: 0, 0
+  index: -1

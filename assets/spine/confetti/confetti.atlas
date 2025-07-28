@@ -1,0 +1,41 @@
+
+confetti.webp
+size: 256,256
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+1
+  rotate: false
+  xy: 82, 16
+  size: 35, 34
+  orig: 35, 34
+  offset: 0, 0
+  index: -1
+2
+  rotate: false
+  xy: 180, 196
+  size: 48, 46
+  orig: 48, 46
+  offset: 0, 0
+  index: -1
+3
+  rotate: false
+  xy: 123, 51
+  size: 55, 191
+  orig: 55, 191
+  offset: 0, 0
+  index: -1
+4
+  rotate: false
+  xy: 2, 52
+  size: 119, 190
+  orig: 119, 190
+  offset: 0, 0
+  index: -1
+5
+  rotate: true
+  xy: 2, 2
+  size: 48, 78
+  orig: 48, 78
+  offset: 0, 0
+  index: -1

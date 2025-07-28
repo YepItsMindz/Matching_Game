@@ -1,0 +1,48 @@
+
+tile.webp
+size: 565,210
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+InnerShine
+  rotate: false
+  xy: 382, 80
+  size: 130, 130
+  orig: 130, 130
+  offset: 0, 0
+  index: -1
+Light
+  rotate: false
+  xy: 514, 26
+  size: 51, 184
+  orig: 51, 184
+  offset: 0, 0
+  index: -1
+LightSQ
+  rotate: true
+  xy: 382, 37
+  size: 41, 118
+  orig: 41, 118
+  offset: 0, 0
+  index: -1
+Particle
+  rotate: false
+  xy: 202, 0
+  size: 30, 30
+  orig: 30, 30
+  offset: 0, 0
+  index: -1
+Ring
+  rotate: false
+  xy: 0, 10
+  size: 200, 200
+  orig: 200, 200
+  offset: 0, 0
+  index: -1
+RingShine
+  rotate: false
+  xy: 202, 32
+  size: 178, 178
+  orig: 178, 178
+  offset: 0, 0
+  index: -1
