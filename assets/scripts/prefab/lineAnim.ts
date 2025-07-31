@@ -29,7 +29,7 @@ export class lineAnim extends Component {
     @property(Prefab)
     particleEffect: Prefab = null;
 
-    public destroyAnimDuration: number = 0.2;
+    public destroyAnimDuration: number = 0.12;
     public starFlyAnimDuration: number = 0.7;
 
     anim() {
@@ -55,7 +55,6 @@ export class lineAnim extends Component {
                     this.starFlyAnimDuration,
                     {
                         worldPosition: endPos,
-                        angle: 300,
                     },
                     {
                         onUpdate: (target, ratio) => {
@@ -81,7 +80,7 @@ export class lineAnim extends Component {
                     node.active = false;
                 })
                 .start();
-        }, 100 * index);
+        }, 50 * index);
     }
 
     static quadraticCurve(

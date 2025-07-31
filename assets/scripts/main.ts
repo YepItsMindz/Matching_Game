@@ -6,19 +6,23 @@ import {
     Graphics,
     instantiate,
     JsonAsset,
+    Label,
     Node,
     path,
     Prefab,
+    ProgressBar,
     resources,
     Sprite,
     SpriteAtlas,
     SpriteFrame,
+    tween,
     UITransform,
     Vec2,
     Vec3,
 } from 'cc';
 import { tilePrefab } from './prefab/tilePrefab';
 import { lineAnim } from './prefab/lineAnim';
+import { timer } from './timer';
 const { ccclass, property } = _decorator;
 
 export const TILE_SIZE = 105;
@@ -39,27 +43,72 @@ export class main extends Component {
     @property(Graphics)
     graphic: Graphics = null;
 
-    private matrixWidth: number = null;
-    private matrixHeight: number = null;
+    @property(Prefab)
+    victory: Prefab = null;
 
-    private isConnect: boolean = true;
-    private preTile: tilePrefab = null;
+    @property(Label)
+    label: Label = null;
 
-    private matrixTiles: tilePrefab[][] = null;
+    @property(ProgressBar)
+    progress: ProgressBar = null;
+
+    public matrixWidth: number = null;
+    public matrixHeight: number = null;
+
+    public isConnect: boolean = true;
+    public preTile: tilePrefab = null;
+
+    public matrixTiles: tilePrefab[][] = null;
+    public level: Node[] = [];
+
+    public curLevel: number = 1;
+    public victoryTmp: Node = null;
 
     protected onLoad(): void {
+        this.loadLevel(this.curLevel);
+    }
+
+    loadLevel(index: number) {
+        let name = 'level-' + index;
+        resources.load(`data/${name}`, JsonAsset, (err, jsonAsset) => {
+            if (err) {
+                console.error(`Failed to load ${name}:`, err);
+            } else {
+                const childNode: Node = new Node(name);
+                childNode.name = name;
+                this.createMap(childNode, jsonAsset);
+                this.level[index] = childNode;
+                childNode.scale = new Vec3(0.2, 0.2, 0.2);
+                this.node.addChild(childNode);
+                this.levelAppear(this.node.getChildByName(childNode.name));
+            }
+        });
+    }
+
+    levelAppear(node: Node) {
+        tween(node)
+            .to(0.2, { scale: new Vec3(1, 1, 1) }, { easing: 'fade' })
+            .start();
+    }
+
+    createMap(childNode: Node, jsonAsset: JsonAsset) {
         //Create Map
-        const map = this.jsonAsset.json.data.map;
-        this.matrixWidth = this.jsonAsset.json.data.tilesAmount;
-        this.matrixHeight = this.jsonAsset.json.data.tilesAmount;
+        this.matrixWidth = 0;
+        this.matrixHeight = 0;
+        const map = jsonAsset.json.data.map;
+        map.forEach((item, index) => {
+            this.matrixWidth = Math.max(this.matrixWidth, item.x + 1);
+            this.matrixHeight = Math.max(this.matrixHeight, item.y + 1);
+        });
 
         //Init
         this.matrixTiles = [];
-        for (let i = 0; i < this.matrixWidth + 1; i++) {
+        for (let i = 0; i < this.matrixWidth; i++) {
             this.matrixTiles[i] = [];
+            for (let j = 0; j < this.matrixHeight; j++) {
+                this.matrixTiles[i][j] = null;
+            }
         }
-
-        console.log(this.node.worldPosition);
 
         map.forEach((item, index) => {
             const nodeTemp: Node = instantiate(this.tilePrefab);
@@ -87,8 +136,9 @@ export class main extends Component {
             });
 
             //Show
-            this.node.addChild(nodeTemp);
+            childNode.addChild(nodeTemp);
         });
+        console.log(this.matrixTiles);
     }
 
     connected(comp: tilePrefab) {
@@ -105,7 +155,8 @@ export class main extends Component {
             );
 
             if (shortPath) {
-                //Draw the connected line && add star
+                const starNodes: { node: Node; y: number }[] = [];
+
                 for (let i = 0; i < shortPath.length - 1; i++) {
                     const [x0, y0] = shortPath[i];
                     const [x1, y1] = shortPath[i + 1];
@@ -113,7 +164,7 @@ export class main extends Component {
                     const nodeTemp = instantiate(this.starPrefab);
                     nodeTemp.setPosition(this.convertMatixToVec3(x0, y0));
                     this.graphic.node.addChild(nodeTemp);
-                    this.graphic.getComponent(lineAnim).starAnim(nodeTemp, i);
+                    starNodes.push({ node: nodeTemp, y: y0 });
 
                     const startPos = this.convertMatixToVec3(x0, y0);
                     const endPos = this.convertMatixToVec3(x1, y1);
@@ -124,7 +175,15 @@ export class main extends Component {
                 const lastNode = instantiate(this.starPrefab);
                 lastNode.setPosition(this.convertMatixToVec3(lastX, lastY));
                 this.graphic.node.addChild(lastNode);
-                this.graphic.getComponent(lineAnim).starAnim(lastNode, shortPath.length-1);
+                starNodes.push({ node: lastNode, y: lastY });
+
+                // Sort and animate
+                starNodes.sort((a, b) => b.y - a.y);
+                starNodes.forEach((star, index) => {
+                    this.graphic
+                        .getComponent(lineAnim)
+                        .starAnim(star.node, index);
+                });
 
                 //Destroy connected tiles
                 this.matrixTiles[this.preTile.posMatrixX][
@@ -134,6 +193,8 @@ export class main extends Component {
                 this.graphic.getComponent(lineAnim).anim();
                 this.preTile.onDestroy();
                 comp.onDestroy();
+
+                this.isVictory();
             } else {
                 this.preTile.onWrong();
                 comp.onWrong();
@@ -148,8 +209,8 @@ export class main extends Component {
         end: [number, number]
     ): [number, number][] | null {
         const matrix = this.matrixTiles;
-        const rows = this.matrixHeight;
-        const cols = this.matrixWidth;
+        const rows = this.matrixWidth;
+        const cols = this.matrixHeight;
         const directions = [
             [1, 0],
             [-1, 0],
@@ -235,6 +296,8 @@ export class main extends Component {
         this.graphic.moveTo(startPos.x, startPos.y);
         this.graphic.lineTo(endPos.x, endPos.y);
         this.graphic.stroke();
+        this.graphic.circle(endPos.x, endPos.y, 8);
+        this.graphic.fill();
     }
 
     convertMatixToVec3(x: number, y: number): Vec3 {
@@ -243,6 +306,21 @@ export class main extends Component {
             (y - (this.matrixHeight - 1) / 2) * TILE_SIZE,
             1
         );
+    }
+
+    isVictory() {
+        const isEmpty = this.matrixTiles.every(row =>
+            row.every(tile => tile == null)
+        );
+        if (isEmpty) {
+            timer.isClicked = false;
+            setTimeout(() => {
+                this.victoryTmp = instantiate(this.victory);
+                this.node.addChild(this.victoryTmp);
+            }, 500);
+            return true;
+        }
+        return false;
     }
 
     update(deltaTime: number) {}

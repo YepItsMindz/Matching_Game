@@ -9,6 +9,7 @@ import {
     UIOpacity,
     Vec3,
 } from 'cc';
+import { timer } from '../timer';
 const { ccclass, property } = _decorator;
 
 @ccclass('tilePrefab')
@@ -54,6 +55,7 @@ export class tilePrefab extends Component {
     }
 
     onClick() {
+        timer.isClicked = true;
         this.getComponent(Button).interactable = false;
         this.tileSelected.node.active = true;
         tween(this.node)
