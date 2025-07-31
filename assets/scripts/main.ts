@@ -3,6 +3,7 @@ import {
     Button,
     CCInteger,
     Component,
+    director,
     Graphics,
     instantiate,
     JsonAsset,
@@ -25,7 +26,7 @@ import { lineAnim } from './prefab/lineAnim';
 import { timer } from './timer';
 const { ccclass, property } = _decorator;
 
-export const TILE_SIZE = 105;
+export const TILE_SIZE = 100;
 @ccclass('main')
 export class main extends Component {
     @property(SpriteAtlas)
@@ -54,15 +55,15 @@ export class main extends Component {
 
     public matrixWidth: number = null;
     public matrixHeight: number = null;
+    public matrixTiles: tilePrefab[][] = null;
 
-    public isConnect: boolean = true;
+    public victoryTmp: Node = null;
     public preTile: tilePrefab = null;
 
-    public matrixTiles: tilePrefab[][] = null;
-    public level: Node[] = [];
-
     public curLevel: number = 1;
-    public victoryTmp: Node = null;
+
+    public isConnect: boolean = true;
+    public isPause: boolean = false;
 
     protected onLoad(): void {
         this.loadLevel(this.curLevel);
@@ -77,7 +78,6 @@ export class main extends Component {
                 const childNode: Node = new Node(name);
                 childNode.name = name;
                 this.createMap(childNode, jsonAsset);
-                this.level[index] = childNode;
                 childNode.scale = new Vec3(0.2, 0.2, 0.2);
                 this.node.addChild(childNode);
                 this.levelAppear(this.node.getChildByName(childNode.name));
@@ -321,6 +321,17 @@ export class main extends Component {
             return true;
         }
         return false;
+    }
+
+    pauseGame() {
+        console.log('iscall');
+        if (!this.isPause) {
+            director.pause();
+            this.isPause = true;
+        } else {
+            director.resume();
+            this.isPause = false;
+        }
     }
 
     update(deltaTime: number) {}
