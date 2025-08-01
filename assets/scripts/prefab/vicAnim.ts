@@ -1,13 +1,4 @@
-import {
-    _decorator,
-    Component,
-    Label,
-    Node,
-    Sprite,
-    tween,
-    UIOpacity,
-    Vec3,
-} from 'cc';
+import { _decorator, Component, Node, tween, UIOpacity, Vec3 } from 'cc';
 import { main } from '../main';
 import { timer } from '../timer';
 const { ccclass, property } = _decorator;
@@ -53,17 +44,11 @@ export class vicAnim extends Component {
         const mainNode = this.node.parent;
         const mainComponent = mainNode.getComponent(main);
         if (mainComponent) {
-            const currentLevelNode = mainNode.getChildByName(
-                `level-${mainComponent.curLevel}`
-            );
-            if (currentLevelNode) {
-                currentLevelNode.active = false;
-            }
             mainComponent.curLevel += 1;
             mainComponent.loadLevel(mainComponent.curLevel);
             mainComponent.progress.progress = 1;
             mainComponent.label.string = 'Level ' + mainComponent.curLevel;
-            timer.isClicked = false;
+            timer.isRunning = false;
             this.node.active = false;
         }
     }

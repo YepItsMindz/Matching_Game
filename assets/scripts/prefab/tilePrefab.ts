@@ -6,7 +6,6 @@ import {
     Sprite,
     SpriteFrame,
     tween,
-    UIOpacity,
     Vec3,
 } from 'cc';
 import { timer } from '../timer';
@@ -35,27 +34,25 @@ export class tilePrefab extends Component {
 
     public posMatrixX: number = null;
     public posMatrixY: number = null;
-    init(index: number, callback: Function) {
+
+    init(index: number, callbackFunction: Function) {
         this.index = index;
-        this.callback = callback;
+        this.callback = callbackFunction;
     }
 
     setImage(spriteFrame: SpriteFrame) {
         this.tile.spriteFrame = spriteFrame;
     }
 
-    compare(comp: tilePrefab): boolean {
+    compareTiles(comp: tilePrefab): boolean {
         if (this.tile.spriteFrame.name === comp.tile.spriteFrame.name) {
             return true;
         } else {
-            this.onWrong();
-            comp.onWrong();
             return false;
         }
     }
 
     onClick() {
-        timer.isClicked = true;
         this.getComponent(Button).interactable = false;
         this.tileSelected.node.active = true;
         tween(this.node)
@@ -79,9 +76,6 @@ export class tilePrefab extends Component {
                 { scale: new Vec3(1.1, 1.1, 1) },
                 { easing: 'backOut' }
             )
-            .start();
-
-        tween(this.node)
             .to(
                 this.wrongAnimDuration,
                 { scale: new Vec3(1, 1, 1) },
@@ -89,12 +83,25 @@ export class tilePrefab extends Component {
             )
             .call(() => {
                 this.tileWrongSelected.node.active = false;
+                this.getComponent(Button).interactable = true;
             })
             .start();
+    }
+
+    onNormal() {
+        this.tileSelected.node.active = false;
         this.getComponent(Button).interactable = true;
+        tween(this.node)
+            .to(
+                this.clickAnimDuration,
+                { scale: new Vec3(1, 1, 1) },
+                { easing: 'backIn' }
+            )
+            .start();
     }
 
     onDestroy() {
+        timer.isRunning = true;
         tween(this.node.getChildByName('tile'))
             .to(
                 this.destroyAnimDuration,
