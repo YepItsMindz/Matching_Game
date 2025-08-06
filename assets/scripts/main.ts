@@ -12,6 +12,7 @@ import {
     resources,
     SpriteAtlas,
     tween,
+    UITransform,
     Vec3,
 } from 'cc';
 import { tilePrefab } from './prefab/tilePrefab';
@@ -46,11 +47,18 @@ export class main extends Component {
     @property(Button)
     shuffleButton: Button = null;
 
+    @property(Button)
+    hintButton: Button = null;
+
+    @property(Node)
+    playScreen: Node = null;
+
     private matrixWidth: number = 0;
     private matrixHeight: number = 0;
     private matrixTiles: (tilePrefab | null)[][] = null;
+    private currentScaleFactor: number = 1;
 
-    public curLevel: number = 1;
+    public curLevel: number = 3;
     private curLevelNode: Node = null;
 
     private victoryTmp: Node = null;
@@ -71,6 +79,15 @@ export class main extends Component {
                 const childNode: Node = new Node(name);
                 this.createMap(childNode, jsonAsset);
                 this.node.addChild(childNode);
+                this.scaleToFitScreen(childNode);
+                // Ensure graphics node is positioned correctly relative to scaled childNode
+                this.scheduleOnce(() => {
+                    if (this.graphic && this.graphic.node) {
+                        // Reset graphics scale and position it relative to the scaled childNode
+                        this.graphic.node.setScale(new Vec3(1, 1, 1));
+                        this.graphic.node.setPosition(childNode.position);
+                    }
+                }, 0);
                 this.levelAppearAnimation(childNode);
                 this.curLevelNode = childNode;
             }
@@ -78,21 +95,28 @@ export class main extends Component {
     }
 
     levelAppearAnimation(node: Node) {
+        const finalScale = node.scale.clone(); // Store the current scale (which might be adjusted for screen size)
         node.scale = new Vec3(0.2, 0.2, 0.2);
-        tween(node)
-            .to(0.2, { scale: new Vec3(1, 1, 1) }, { easing: 'fade' })
-            .start();
+        tween(node).to(0.2, { scale: finalScale }, { easing: 'fade' }).start();
     }
 
     createMap(childNode: Node, jsonAsset: JsonAsset) {
         //Create Map
         const map = jsonAsset.json.data.map;
-        this.matrixWidth = 0;
-        this.matrixHeight = 0;
+        let maxWidth = 0;
+        let minWidth = 10;
+        let maxHeight = 0;
+        let minHeight = 10;
         map.forEach(item => {
-            this.matrixWidth = Math.max(this.matrixWidth, item.x + 1);
-            this.matrixHeight = Math.max(this.matrixHeight, item.y + 1);
+            maxWidth = Math.max(maxWidth, item.x + 1);
+            minWidth = Math.min(minWidth, item.x);
+            maxHeight = Math.max(maxHeight, item.y + 1);
+            minHeight = Math.min(minHeight, item.y);
         });
+        if (minWidth === 0) this.matrixWidth = maxWidth - minWidth - 1;
+        else this.matrixWidth = maxWidth - minWidth + 1;
+        if (minHeight === 0) this.matrixHeight = maxHeight - minHeight - 1;
+        else this.matrixHeight = maxHeight - minHeight + 1;
 
         //Init matrix of tiles
         this.matrixTiles = [];
@@ -132,13 +156,42 @@ export class main extends Component {
         });
     }
 
+    scaleToFitScreen(childNode: Node) {
+        const height = TILE_SIZE * (this.matrixHeight + 1);
+        const width = TILE_SIZE * (this.matrixWidth + 1);
+
+        const playScreenTransform = this.playScreen.getComponent(UITransform);
+        const playScreenHeight = playScreenTransform.contentSize.y;
+        const playScreenWidth = playScreenTransform.contentSize.x;
+
+        // Calculate scale factors for both dimensions
+        const scaleFactorHeight = playScreenHeight / height;
+
+        // Use the smaller scale factor to ensure the content fits in both dimensions
+        const scaleFactor = scaleFactorHeight * 0.9;
+
+        if (scaleFactor < 1) {
+            this.currentScaleFactor = scaleFactor;
+            childNode.setScale(new Vec3(scaleFactor, scaleFactor, 1));
+            console.log(
+                `Scaling childNode: height=${height}, width=${width}, playScreen=${playScreenWidth}x${playScreenHeight}, scale=${scaleFactor}`
+            );
+        } else {
+            this.currentScaleFactor = 1;
+        }
+    }
+
     connected(comp: tilePrefab) {
+        this.clearAllHints();
         this.preTile = comp;
         this.isConnect = false;
     }
 
     unconnected(comp: tilePrefab) {
+        this.clearAllHints();
+
         const isSimilar = this.preTile.compareTiles(comp);
+
         if (isSimilar) {
             const shortPath = this.shortestPath(
                 [this.preTile.posMatrixX, this.preTile.posMatrixY],
@@ -193,8 +246,8 @@ export class main extends Component {
 
     convertMatixToVec3(x: number, y: number): Vec3 {
         return new Vec3(
-            (x - (this.matrixWidth - 1) / 2) * TILE_SIZE,
-            (y - (this.matrixHeight - 1) / 2) * TILE_SIZE,
+            (x - this.matrixWidth / 2) * TILE_SIZE,
+            (y - this.matrixHeight / 2) * TILE_SIZE,
             1
         );
     }
@@ -205,7 +258,20 @@ export class main extends Component {
             const [x1, y1] = shortPath[i + 1];
             const startPos = this.convertMatixToVec3(x0, y0);
             const endPos = this.convertMatixToVec3(x1, y1);
-            this.drawLine(startPos, endPos);
+
+            // Apply the scale factor to match the scaled childNode positions
+            const scaledStartPos = new Vec3(
+                startPos.x * this.currentScaleFactor,
+                startPos.y * this.currentScaleFactor,
+                startPos.z
+            );
+            const scaledEndPos = new Vec3(
+                endPos.x * this.currentScaleFactor,
+                endPos.y * this.currentScaleFactor,
+                endPos.z
+            );
+
+            this.drawLine(scaledStartPos, scaledEndPos);
         }
     }
 
@@ -213,7 +279,19 @@ export class main extends Component {
         for (let i = 0; i < shortPath.length; i++) {
             const [x0, y0] = shortPath[i];
             const star = instantiate(this.starPrefab);
-            star.setPosition(this.convertMatixToVec3(x0, y0));
+            star.setScale(
+                new Vec3(this.currentScaleFactor, this.currentScaleFactor, 1)
+            );
+            const basePosition = this.convertMatixToVec3(x0, y0);
+
+            // Apply the scale factor to match the scaled childNode positions
+            const scaledPosition = new Vec3(
+                basePosition.x * this.currentScaleFactor,
+                basePosition.y * this.currentScaleFactor,
+                basePosition.z
+            );
+
+            star.setPosition(scaledPosition);
             this.graphic.node.addChild(star);
             starNodes.push([star, y0]);
         }
@@ -333,8 +411,9 @@ export class main extends Component {
 
     shuffleTiles() {
         if (this.matrixTiles) {
+            this.clearAllHints();
             this.shuffleButton.interactable = false;
-            // Collect all non-null tiles and their positions
+
             const tiles: tilePrefab[] = [];
             const positions: { x: number; y: number }[] = [];
 
@@ -347,32 +426,73 @@ export class main extends Component {
                 }
             }
 
-            // Shuffle the tiles array using Fisher-Yates algorithm
             for (let i = tiles.length - 1; i > 0; i--) {
                 const randomIndex = Math.floor(Math.random() * (i + 1));
                 [tiles[i], tiles[randomIndex]] = [tiles[randomIndex], tiles[i]];
             }
 
-            // Animate tiles to their new positions
             for (let i = 0; i < positions.length; i++) {
                 const pos = positions[i];
                 const tile = tiles[i];
                 const newPosition = this.convertMatixToVec3(pos.x, pos.y);
 
-                // Update matrix
                 this.matrixTiles[pos.x][pos.y] = tile;
 
-                // Update tile's matrix position
                 tile.posMatrixX = pos.x;
                 tile.posMatrixY = pos.y;
 
-                // Animate to new position with tween
                 tween(tile.node)
                     .to(0.5, { position: newPosition }, { easing: 'sineOut' })
                     .call(() => {
                         this.shuffleButton.interactable = true;
                     })
                     .start();
+            }
+        }
+    }
+
+    hintSimilarTiles() {
+        if (!this.matrixTiles) return;
+
+        const allTiles: tilePrefab[] = [];
+        for (let i = 0; i < this.matrixWidth + 1; i++) {
+            for (let j = 0; j < this.matrixHeight + 1; j++) {
+                if (this.matrixTiles[i][j] !== null) {
+                    allTiles.push(this.matrixTiles[i][j]);
+                }
+            }
+        }
+
+        for (let i = 0; i < allTiles.length; i++) {
+            for (let j = i + 1; j < allTiles.length; j++) {
+                const tile1 = allTiles[i];
+                const tile2 = allTiles[j];
+
+                if (!tile1.isClicked && !tile2.isClicked)
+                    if (tile1.compareTiles(tile2)) {
+                        const path = this.shortestPath(
+                            [tile1.posMatrixX, tile1.posMatrixY],
+                            [tile2.posMatrixX, tile2.posMatrixY]
+                        );
+
+                        if (path) {
+                            tile1.onHint();
+                            tile2.onHint();
+                            return;
+                        }
+                    }
+            }
+        }
+    }
+
+    clearAllHints() {
+        if (!this.matrixTiles) return;
+        for (let i = 0; i < this.matrixWidth + 1; i++) {
+            for (let j = 0; j < this.matrixHeight + 1; j++) {
+                const tile = this.matrixTiles[i][j];
+                if (tile && tile.isHint) {
+                    tile.onHint();
+                }
             }
         }
     }
